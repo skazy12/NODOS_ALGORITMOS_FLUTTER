@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -25,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Grafos'),
-        //Boton de ayuda para desplegar un dialogo con la ayuda
         actions: [
           IconButton(
             icon: Icon(Icons.help),
@@ -34,18 +35,106 @@ class _HomeScreenState extends State<HomeScreen> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text('Ayuda'),
-
-                    //TEXTO DE AYUDA
+                    title: Text('HELP'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.add_circle),
+                          label: Text(
+                              'Para Agregar un nodo, seleccione la opcion "Agregar nodo (+)" y seleccione en el lugar donde desea agregarlo.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.edit_location),
+                          label: Text(
+                              ' Para Mover un nodo, seleccione la opcion "Mover nodo (Lápiz en una ubicación)" y arrastre el nodo.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.remove_circle),
+                          label: Text(
+                              ' Para Eliminar un nodo, seleccione la opcion "Remover nodo (-)de fondo oscuro" y seleccione el nodo que desea eliminar.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.arrow_right_alt_outlined),
+                          label: Text(
+                              'Para agregar un enlace, seleccione la opcion "Agregar enlace (->)" y seleccione el nodo de origen y luego en el nodo de destino. '),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.remove_circle_outline_rounded),
+                          label: Text(
+                              'Para eliminar un enlace, seleccione la opcion "Remover enlace (-)de fondo claro" y seleccione el un Nodo donde le aparecerá una lista de enlaces del nodo, eliminelo con el icono de basurero.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.add_road_outlined),
+                          label: Text(
+                              'Para agregar un peso a un enlace, seleccione la opcion "Agregar valor al enlace (icono de vía con un +)" y seleccione el Nodo que tiene el enlace a Editar. Seleccione de la lista el enlace.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.list),
+                          label: Text(
+                              'Para generar la matriz de adyacencia presione el icono que muestra a la izquierda.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        child: Text('Cerrar'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.group),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Integrantes'),
                     content: Text(
-                        'Seleccione una opcion de la barra inferior: . \n\n'
-                        '- Para Agregar un nodo, seleccione la opcion "Agregar nodo (+)" y seleccione en el lugar donde desea agregarlo. \n\n'
-                        '- Para Mover un nodo, seleccione la opcion "Mover nodo (Lápiz en una ubicación)" y arrastre el nodo. \n\n'
-                        '- Para Eliminar un nodo, seleccione la opcion "Remover nodo (-)de fondo oscuro" y seleccione el nodo que desea eliminar. \n\n'
-                        '- Para agregar un enlace, seleccione la opcion "Agregar enlace (->)" y seleccione el nodo de origen y luego en el nodo de destino. \n\n'
-                        '- Para eliminar un enlace, seleccione la opcion "Remover enlace (-)de fondo claro" y seleccione el un Nodo donde le aparecerá una lista de enlaces del nodo, eliminelo con el icono de basurero. \n\n'
-                        '- Para agregar un peso a un enlace, seleccione la opcion "Agregar valor al enlace (icono de vía con un +)" y seleccione el Nodo que tiene el enlace a Editar. Seleccione de la lista el enlace. \n\n'
-                        'Para ver la matriz de adyacencia, seleccione la opcion "Matriz de adyacencia (tabla)" y se desplegara una ventana con la matriz de adyacencia. \n\n'),
+                      '1. Geraldine Ibieta \n\n'
+                      '2. Carlos Camargo \n\n'
+                      '3. Andre Panique \n\n'
+                      '4. Omar Rodriguez \n\n'
+                      '5. Mirko Alarcon \n\n'
+                      '6. Carlos Zarate \n\n',
+                      style: TextStyle(fontSize: 20),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () {
