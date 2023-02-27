@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grafo'),
+        title: Text('Grafos'),
         //Boton de ayuda para desplegar un dialogo con la ayuda
         actions: [
           IconButton(
@@ -35,8 +35,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context) {
                   return AlertDialog(
                     title: Text('Ayuda'),
+
                     //TEXTO DE AYUDA
-                    content: Text('Aquí va la ayuda'),
+                    content: Text(
+                        'Seleccione una opcion de la barra inferior: . \n\n'
+                        '- Para Agregar un nodo, seleccione la opcion "Agregar nodo (+)" y seleccione en el lugar donde desea agregarlo. \n\n'
+                        '- Para Mover un nodo, seleccione la opcion "Mover nodo (Lápiz en una ubicación)" y arrastre el nodo. \n\n'
+                        '- Para Eliminar un nodo, seleccione la opcion "Remover nodo (-)de fondo oscuro" y seleccione el nodo que desea eliminar. \n\n'
+                        '- Para agregar un enlace, seleccione la opcion "Agregar enlace (->)" y seleccione el nodo de origen y luego en el nodo de destino. \n\n'
+                        '- Para eliminar un enlace, seleccione la opcion "Remover enlace (-)de fondo claro" y seleccione el un Nodo donde le aparecerá una lista de enlaces del nodo, eliminelo con el icono de basurero. \n\n'
+                        '- Para agregar un peso a un enlace, seleccione la opcion "Agregar valor al enlace (icono de vía con un +)" y seleccione el Nodo que tiene el enlace a Editar. Seleccione de la lista el enlace. \n\n'
+                        'Para ver la matriz de adyacencia, seleccione la opcion "Matriz de adyacencia (tabla)" y se desplegara una ventana con la matriz de adyacencia. \n\n'),
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -402,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add_circle),
               tooltip: 'Agregar nodo',
               onPressed: () {
                 setState(() {
@@ -411,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.edit_location),
               tooltip: 'Mover nodo',
               onPressed: () {
                 setState(() {
@@ -420,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.remove),
+              icon: Icon(Icons.remove_circle),
               tooltip: 'Remover nodo',
               onPressed: () {
                 setState(() {
@@ -429,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.arrow_right_alt_outlined),
               tooltip: 'Agregar enlace',
               onPressed: () {
                 setState(() {
@@ -438,7 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.remove),
+              icon: Icon(Icons.remove_circle_outline_rounded),
               tooltip: 'Remover enlace',
               onPressed: () {
                 setState(() {
@@ -447,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.add_road_outlined),
               tooltip: 'Agregar valor enlace',
               onPressed: () {
                 setState(() {
@@ -456,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.calculate),
+              icon: Icon(Icons.list),
               tooltip: 'Generar Matriz de Adyacencia',
               onPressed: () {
                 setState(() {
@@ -528,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
       nombresNodos.length,
       (index) {
         if (index == 0) {
-          return DataColumn(label: Text(""));
+          return DataColumn(label: Text("Nodo"));
         }
         return DataColumn(label: Text(nombresNodos[index]));
       },
