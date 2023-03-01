@@ -22,10 +22,10 @@ class Nodos extends CustomPainter {
       canvas.drawCircle(Offset(nodo.x, nodo.y), 25, borde);
       final texto = TextPainter(
         text: TextSpan(
-          text: nodo.valor.toString(),
+          text: nodo.valor,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 16,
           ),
         ),
         textDirection: TextDirection.ltr,

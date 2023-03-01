@@ -14,9 +14,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  Nodo nodoOrigen = Nodo(valor: 0, x: 0, y: 0);
-  Nodo nodoDestino = Nodo(valor: 0, x: 0, y: 0);
-  Nodo nodoSeleccionado = Nodo(valor: 0, x: 0, y: 0);
+  Nodo nodoOrigen = Nodo(valor: "", x: 0, y: 0);
+  Nodo nodoDestino = Nodo(valor: "", x: 0, y: 0);
+  Nodo nodoSeleccionado = Nodo(valor: "", x: 0, y: 0);
   int click = 0;
   List<Nodo> nodos = [];
   List<Enlace> enlaces = [];
@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTapDown: (details) {
                   setState(() {
                     nodos.add(Nodo(
-                        valor: nodos.length + 1,
+                        valor: "",
                         x: details.localPosition.dx,
                         y: details.localPosition.dy));
                   });
@@ -492,6 +492,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+          //OPCION CAMBIARF NOMBRE
+          if (_currentIndex == 6)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onTapDown: (details) {
+                  setState(() {
+                    try {
+                      nodos.forEach((nodo) {
+                        if (sqrt(pow(nodo.x - details.localPosition.dx, 2) +
+                                pow(nodo.y - details.localPosition.dy, 2)) <
+                            25) {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Ingrese el nombre del nodo"),
+                                  content: TextField(
+                                    onChanged: (value) {
+                                      nodo.valor = value;
+                                    },
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Aceptar"))
+                                  ],
+                                );
+                              });
+                        }
+                      });
+                    } catch (e) {}
+                  });
+                },
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -550,6 +594,15 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 setState(() {
                   _currentIndex = 5;
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.generating_tokens_outlined),
+              tooltip: 'Cambiar nombre nodo',
+              onPressed: () {
+                setState(() {
+                  _currentIndex = 6;
                 });
               },
             ),

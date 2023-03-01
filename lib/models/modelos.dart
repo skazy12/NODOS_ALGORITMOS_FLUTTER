@@ -1,5 +1,5 @@
 class Nodo {
-  final int valor;
+  String valor;
   double x;
   double y;
 
