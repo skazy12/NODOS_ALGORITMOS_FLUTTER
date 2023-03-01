@@ -96,9 +96,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         TextButton.icon(
                           onPressed: () {},
+                          icon: Icon(Icons.generating_tokens_outlined),
+                          label: Text(
+                              'Para cambiar el nombre del grafo presione el icono que muestra a la izquierda. Y luego escriba el nombre del grafo.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
                           icon: Icon(Icons.list),
                           label: Text(
                               'Para generar la matriz de adyacencia presione el icono que muestra a la izquierda.'),
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black)),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.clear),
+                          label: Text(
+                              'Para limpiar toda la pantalla presione el icono que muestra a la izquierda y luego presione la pantalla'),
                           style: ButtonStyle(
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   Colors.black)),
@@ -492,7 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-          //OPCION CAMBIARF NOMBRE
+          //OPCION CAMBIAR NOMBRE
           if (_currentIndex == 6)
             Positioned(
               top: 0,
@@ -529,6 +547,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       });
                     } catch (e) {}
+                  });
+                },
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+          //boton para limpiar la pantalla
+          if (_currentIndex == 7)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onTapDown: (details) {
+                  setState(() {
+                    nodos.clear();
+                    enlaces.clear();
                   });
                 },
                 child: Container(
@@ -632,6 +669,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     );
                   }
+                });
+              },
+            ),
+            //limpiar la pantalla
+            IconButton(
+              icon: Icon(Icons.clear),
+              tooltip: 'Limpiar',
+              onPressed: () {
+                setState(() {
+                  _currentIndex = 7;
                 });
               },
             ),
