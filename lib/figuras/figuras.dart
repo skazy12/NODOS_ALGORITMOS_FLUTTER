@@ -25,7 +25,7 @@ class Nodos extends CustomPainter {
           text: nodo.valor.toString(),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 16,
           ),
         ),
         textDirection: TextDirection.ltr,
