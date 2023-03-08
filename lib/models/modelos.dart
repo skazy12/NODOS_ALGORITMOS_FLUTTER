@@ -1,9 +1,14 @@
 class Nodo {
   final int valor;
+  String nombre;
   double x;
   double y;
 
-  Nodo({required this.valor, required this.x, required this.y});
+  Nodo(
+      {required this.valor,
+      required this.x,
+      required this.y,
+      required this.nombre});
 }
 
 class Enlace {

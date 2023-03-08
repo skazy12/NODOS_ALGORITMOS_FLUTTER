@@ -14,9 +14,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  Nodo nodoOrigen = Nodo(valor: 0, x: 0, y: 0);
-  Nodo nodoDestino = Nodo(valor: 0, x: 0, y: 0);
-  Nodo nodoSeleccionado = Nodo(valor: 0, x: 0, y: 0);
+  Nodo nodoOrigen = Nodo(valor: 0, x: 0, y: 0, nombre: "");
+  Nodo nodoDestino = Nodo(valor: 0, x: 0, y: 0, nombre: "");
+  Nodo nodoSeleccionado = Nodo(valor: 0, x: 0, y: 0, nombre: "");
   int click = 0;
   List<Nodo> nodos = [];
   List<Enlace> enlaces = [];
@@ -173,7 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     nodos.add(Nodo(
                         valor: nodos.length + 1,
                         x: details.localPosition.dx,
-                        y: details.localPosition.dy));
+                        y: details.localPosition.dy,
+                        nombre: ""));
                   });
                 },
                 child: Container(
