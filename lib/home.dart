@@ -1,11 +1,16 @@
-// ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'asignacion.dart';
 import 'figuras/figuras.dart';
+import 'johonson.dart';
 import 'models/modelos.dart';
+import 'noroeste.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -28,6 +33,62 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Grafos'),
         actions: [
+          //Icono para guardar el grafo
+          IconButton(
+              onPressed: () {
+                //preguntar por el nombre del archivo en el que se guardara el grafo
+                //y luego llamar al metodo guardarGrafo
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      TextEditingController _nombreController =
+                          TextEditingController();
+                      return AlertDialog(
+                        title: Text('Guardar grafo'),
+                        content: TextField(
+                          controller: _nombreController,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Nombre del archivo'),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Grafo grafo =
+                                    Grafo(nodos: nodos, enlaces: enlaces);
+                                grafo.guardarGrafo(_nombreController.text);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Guardar'))
+                        ],
+                      );
+                    });
+              },
+              icon: Icon(Icons.save)),
+          //Icono para cargar el grafo
+          IconButton(
+              onPressed: () {
+                //seleccionar el archivo del que se cargara el grafo
+                //y luego llamar al metodo cargarGrafo
+                FilePicker.platform
+                    .pickFiles(type: FileType.custom, allowedExtensions: [
+                  'txt',
+                ]).then((result) {
+                  if (result != null) {
+                    nodos = [];
+                    enlaces = [];
+                    File file = File(result.files.single.path ?? "");
+                    Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
+                    grafo.cargarGrafo(file);
+                    setState(() {
+                      //actualizar los nodos y enlaces
+                      nodos = grafo.nodos;
+                      enlaces = grafo.enlaces;
+                    });
+                  }
+                });
+              },
+              icon: Icon(Icons.upload_file)),
           IconButton(
               onPressed: () {
                 setState(() {
@@ -176,6 +237,50 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      //BARRA LATERAL PARA SELECCIONAR ALGORITMOS
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('ALGORITMOS'),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 15, 51, 80),
+              ),
+            ),
+            ListTile(
+              title: Text('ALGORITMO DE JOHNSON'),
+              onTap: () {
+                //ir a la pantalla de johnson
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Johnson()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('ALGORITMO DE ASIGNACIÓN'),
+              onTap: () {
+                //ir a la pantalla de asignacion
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Asignacion()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('ALGORITMO DE NOROESTE'),
+              onTap: () {
+                //ir a la pantalla de noroeste
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Noroeste()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Stack(
         children: [
           CustomPaint(
@@ -183,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(),
           ),
           CustomPaint(
-            painter: Enlaces(enlaces: enlaces),
+            painter: EnlaceDirigido(enlaces: enlaces),
             child: Container(),
           ),
           //OPCION AGREAGAR NODO
@@ -686,16 +791,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
-            //limpiar la pantalla
-            // IconButton(
-            //   icon: Icon(Icons.clear),
-            //   tooltip: 'Limpiar',
-            //   onPressed: () {
-            //     setState(() {
-            //       _currentIndex = 7;
-            //     });
-            //   },
-            // ),
           ],
         ),
       ),
@@ -713,18 +808,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void generarMatrizAdyacencia() {
-    List<List<int>> matriz = [];
+    List<List<String>> matriz = [];
 
     // Insertar primera fila con los números de los nodos y un espacio en blanco
     List<String> nombresNodos =
         nodos.map((nodo) => "Nodo ${nodo.valor}").toList();
     nombresNodos.insert(0, "");
-    matriz.add(List<int>.filled(nombresNodos.length, 0));
+    matriz.add(List<String>.filled(nombresNodos.length, "0"));
     for (int i = 1; i < nombresNodos.length; i++) {
-      List<int> fila = List<int>.filled(nombresNodos.length, 0);
+      List<String> fila = List<String>.filled(nombresNodos.length, "0");
 
       // Insertar nombre del nodo en primera columna
-      fila[0] = i;
+      fila[0] = nodos[i - 1].valor;
 
       matriz.add(fila);
     }
@@ -732,8 +827,8 @@ class _HomeScreenState extends State<HomeScreen> {
     for (Enlace enlace in enlaces) {
       int origen = nodos.indexOf(enlace.origen) + 1;
       int destino = nodos.indexOf(enlace.destino) + 1;
-      matriz[origen][destino] = enlace.peso;
-      matriz[destino][origen] = enlace.peso;
+      matriz[origen][destino] = enlace.peso.toString();
+      matriz[destino][origen] = enlace.peso.toString();
     }
 
     List<DataColumn> columnas = List<DataColumn>.generate(
@@ -742,7 +837,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (index == 0) {
           return DataColumn(label: Text("Nodo"));
         }
-        return DataColumn(label: Text(nombresNodos[index]));
+        return DataColumn(label: Text(nodos[index - 1].valor));
       },
     );
 
@@ -751,20 +846,31 @@ class _HomeScreenState extends State<HomeScreen> {
       (index) => DataRow(
         cells: List<DataCell>.generate(
           nombresNodos.length,
-          (j) => DataCell(Text(matriz[index + 1][j].toString() + " ")),
+          (j) => DataCell(Text(matriz[index + 1][j].toString())),
         ),
       ),
     );
+    Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
+    grafo.generarMatrizAdyacencia();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Matriz de Adyacencia'),
-          content: SingleChildScrollView(
-            child: DataTable(
-              columns: columnas,
-              rows: filas,
+          content: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: columnas,
+                  rows: filas,
+                ),
+              ),
             ),
           ),
           actions: [

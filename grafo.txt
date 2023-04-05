@@ -1,0 +1,15 @@
+dos,396.0,60.0
+uno,138.4,404.0
+tres,774.4,184.0
+cuatro,755.2,480.0
+cinco,967.2,291.2
+seis,1004.8,110.4
+
+uno:tres:12
+dos:tres:5
+uno:dos:9
+uno:cuatro:12
+tres:cinco:1
+tres:seis:7
+cinco:seis:3
+uno:uno:25
