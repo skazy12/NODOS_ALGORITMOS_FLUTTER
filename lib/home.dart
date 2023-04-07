@@ -5,7 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
+import 'package:nodos2/models/controller.dart';
+import 'package:path/path.dart';
 import 'asignacion.dart';
 import 'figuras/figuras.dart';
 import 'johonson.dart';
@@ -26,12 +28,19 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Nodo> nodos = [];
   List<Enlace> enlaces = [];
   TextEditingController _pesoController = TextEditingController();
+  //instancia del controlador de nodos y enlaces
+  GrafoController grafoController = Get.put(GrafoController());
+  NodoIFController nodoIFController = Get.put(NodoIFController());
+  //instancia del controlador de archivos
+  String nombre_archivo = "";
 
+  List<Enlace> camino = [];
+  List<Enlace> rutaCritica = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grafos'),
+        title: Text('GRAFO: $nombre_archivo'),
         actions: [
           //Icono para guardar el grafo
           IconButton(
@@ -58,6 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Grafo(nodos: nodos, enlaces: enlaces);
                                 grafo.guardarGrafo(_nombreController.text);
                                 Navigator.pop(context);
+                                setState(() {
+                                  nombre_archivo = _nombreController.text;
+                                });
                               },
                               child: Text('Guardar'))
                         ],
@@ -81,7 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
                     grafo.cargarGrafo(file);
                     setState(() {
-                      //actualizar los nodos y enlaces
+                      //actualizar los nodos y enlaces, y el nombre del archivo
+                      nombre_archivo = basename(file.path);
                       nodos = grafo.nodos;
                       enlaces = grafo.enlaces;
                     });
@@ -94,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   nodos = [];
                   enlaces = [];
+                  nombre_archivo = "";
                 });
               },
               icon: Icon(Icons.delete)),
@@ -251,11 +265,75 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               title: Text('ALGORITMO DE JOHNSON'),
               onTap: () {
-                //ir a la pantalla de johnson
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Johnson()),
-                );
+                //instanciar los nodos y enlaces al controlador, los nodos son originales y nodojohnson es el que se va a modificar
+                grafoController.nodos = nodos;
+                grafoController.enlaces = enlaces;
+
+                grafoController.nodosJohnson = nodos;
+                grafoController.enlacesJohnson = enlaces;
+                grafoController.enlacesRutaCritica = enlaces;
+                //instanciamos un grafo para poder usar los metodos de la clase grafo
+                Grafo grafo = Grafo(
+                    nodos: grafoController.nodos,
+                    enlaces: grafoController.enlaces);
+                grafo.reasignarPesos();
+                grafo.eliminarNodoExtra();
+                //seleccionar el nodo origen mostrando una lista de nodos, guardar el nodo origen en la variable nodoOrigen, luego mostrar en otro dialog la lista de nodos destino y guardar el nodo destino en la variable nodoDestino
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return SimpleDialog(
+                      title: Text('Seleccionar nodo origen'),
+                      children: nodos.map((nodo) {
+                        return SimpleDialogOption(
+                          child: Text(nodo.valor),
+                          onPressed: () {
+                            setState(() {
+                              nodoOrigen = nodo;
+                              nodoIFController.setNodoInicial(nodo.valor);
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ).then((_) {
+                  // Mostrar lista de nodos para seleccionar el nodo destino
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: Text('Seleccionar nodo destino'),
+                        children: nodos.map((nodo) {
+                          return SimpleDialogOption(
+                            child: Text(nodo.valor),
+                            onPressed: () {
+                              setState(() {
+                                nodoDestino = nodo;
+                                nodoIFController.setNodoFinal(nodo.valor);
+                              });
+                              Navigator.pop(context);
+                              camino =
+                                  grafo.caminoMasCorto(nodoOrigen, nodoDestino);
+
+                              rutaCritica =
+                                  grafo.rutaCritica(nodoOrigen, nodoDestino);
+                              grafoController.enlacesRutaCritica = rutaCritica;
+                              grafoController.enlacesJohnson = camino;
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Johnson()),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },
+                  );
+                });
               },
             ),
             ListTile(
@@ -288,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(),
           ),
           CustomPaint(
-            painter: EnlaceDirigido(enlaces: enlaces),
+            painter: EnlaceDirigido(enlaces: enlaces, ruta: false),
             child: Container(),
           ),
           //OPCION AGREAGAR NODO
@@ -668,25 +746,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-          //boton para limpiar la pantalla
-          // if (_currentIndex == 7)
-          //   Positioned(
-          //     top: 0,
-          //     left: 0,
-          //     right: 0,
-          //     bottom: 0,
-          //     child: GestureDetector(
-          //       onTapDown: (details) {
-          //         setState(() {
-          //           nodos.clear();
-          //           enlaces.clear();
-          //         });
-          //       },
-          //       child: Container(
-          //         color: Colors.transparent,
-          //       ),
-          //     ),
-          //   ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -854,7 +913,7 @@ class _HomeScreenState extends State<HomeScreen> {
     grafo.generarMatrizAdyacencia();
 
     showDialog(
-      context: context,
+      context: this.context,
       builder: (context) {
         return AlertDialog(
           title: Text('Matriz de Adyacencia'),
