@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:nodos2/asignacion.dart';
 import 'package:nodos2/models/modelos.dart';
 
 class GrafoController extends GetxController {
@@ -40,5 +41,42 @@ class NodoIFController extends GetxController {
 
   void setNodoFinal(String nodo) {
     nodoFinal = nodo;
+  }
+}
+
+class AsignacionController extends GetxController {
+  List<List<dynamic>> matrizOriginal = [];
+  List<List<dynamic>> matrizResultante = [];
+  List<List<dynamic>> matrizBinaria = [];
+  String maxMin = '';
+  dynamic costoOptimo = 0;
+  //getter y setter de la matriz original
+  void setMatrizOriginal(List<List<dynamic>> matriz) {
+    matrizOriginal = matriz;
+  }
+
+  //getter y setter de la matriz de asignacion
+  void setMatrizResultante(List<List<dynamic>> matriz) {
+    matrizResultante = matriz;
+  }
+
+  //getter y setter de la matriz binaria
+  void setMatrizBinaria(List<List<dynamic>> matriz) {
+    matrizBinaria = matriz;
+  }
+
+  //setter de maxmin
+  void setMaxMin(String maxmin) {
+    maxMin = maxmin;
+  }
+
+  //metodo para resetear todas las matrices y variables
+  void resetAsignacion() {
+    matrizOriginal = [];
+    matrizResultante = [];
+    matrizBinaria = [];
+    maxMin = '';
+    costoOptimo = 0;
+    update();
   }
 }

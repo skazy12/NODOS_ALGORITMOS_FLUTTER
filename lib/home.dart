@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   NodoIFController nodoIFController = Get.put(NodoIFController());
   //instancia del controlador de archivos
   String nombre_archivo = "";
+  //controlador para Asignacion
+  AsignacionController asignacionController = Get.put(AsignacionController());
 
   List<Enlace> camino = [];
   List<Enlace> rutaCritica = [];
@@ -336,15 +338,108 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
-            ListTile(
+            ExpansionTile(
               title: Text('ALGORITMO DE ASIGNACIÓN'),
-              onTap: () {
-                //ir a la pantalla de asignacion
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Asignacion()),
-                );
-              },
+              children: <Widget>[
+                ListTile(
+                  title: Text('MINIMIZAR COSTO'),
+                  onTap: () {
+                    //ir a la pantalla de asignacion
+                    if (nodos.length > 0 && enlaces.length > 0) {
+                      Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
+                      List<List<dynamic>> matriz = grafo.matrizAdyacencia();
+                      List<List<dynamic>> resResultante =
+                          grafo.resultadoConCeros(matriz, true);
+
+                      //ingresar datos al controlador
+                      asignacionController.matrizResultante = resResultante;
+                      List<List<dynamic>> matrizOriginal =
+                          grafo.matrizAdyacencia();
+                      asignacionController.matrizOriginal = matrizOriginal;
+                      List<List<dynamic>> asignacionbinaria =
+                          grafo.maxMinMatrizBinaria(
+                              matrizOriginal, resResultante, true);
+                      asignacionController.matrizBinaria = asignacionbinaria;
+
+                      asignacionController.costoOptimo = grafo.calcularCosto(
+                          matrizOriginal, asignacionbinaria);
+                      asignacionController.maxMin = "MINIMIZCION";
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Asignacion()),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('No se ha creado un grafo'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Cerrar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+                ListTile(
+                  title: Text('MAXIMIZAR BENEFICIO'),
+                  onTap: () {
+                    //ir a la pantalla de asignacion
+                    if (nodos.length > 0 && enlaces.length > 0) {
+                      Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
+                      List<List<dynamic>> matriz = grafo.matrizAdyacencia();
+                      List<List<dynamic>> resResultante =
+                          grafo.resultadoConCeros(matriz, false);
+                      //ingresar datos al controlador
+                      asignacionController.matrizResultante = resResultante;
+                      List<List<dynamic>> matrizOriginal =
+                          grafo.matrizAdyacencia();
+                      asignacionController.matrizOriginal = matrizOriginal;
+                      List<List<dynamic>> asignacionbinaria =
+                          grafo.maxMinMatrizBinaria(
+                              matrizOriginal, resResultante, false);
+                      asignacionController.matrizBinaria = asignacionbinaria;
+                      //imprimir la matriz de asignacion
+
+                      asignacionController.costoOptimo = grafo.calcularCosto(
+                          matrizOriginal, asignacionbinaria);
+                      asignacionController.maxMin = "MAXIMIZACION";
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Asignacion()),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('No se ha creado un grafo'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Cerrar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
             ListTile(
               title: Text('ALGORITMO DE NOROESTE'),
@@ -910,7 +1005,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
-    grafo.generarMatrizAdyacencia();
+    // grafo.generarMatrizAdyacencia();
 
     showDialog(
       context: this.context,
