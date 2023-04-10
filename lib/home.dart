@@ -35,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String nombre_archivo = "";
   //controlador para Asignacion
   AsignacionController asignacionController = Get.put(AsignacionController());
+  //controlador para Noroeste
+  NoroesteController noroesteController = Get.put(NoroesteController());
 
   List<Enlace> camino = [];
   List<Enlace> rutaCritica = [];
@@ -443,14 +445,126 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               title: Text('ALGORITMO DE NOROESTE'),
-              onTap: () {
-                //ir a la pantalla de noroeste
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Noroeste()),
-                );
+              onTap: () async {
+                if (nodos.length > 0 && enlaces.length > 0) {
+                  Grafo grafo = Grafo(nodos: nodos, enlaces: enlaces);
+                  List<List<dynamic>> matriz = grafo.matrizAdyacencia();
+
+                  // Crear una nueva matriz con una fila y columna extra
+                  List<List<dynamic>> extendedMatrix =
+                      List.generate(matriz.length + 1, (i) {
+                    if (i == matriz.length) {
+                      return List.filled(matriz[0].length + 1, null);
+                    } else {
+                      return List.from(matriz[i])..add(null);
+                    }
+                  });
+
+                  // Asignar "Demanda" y "Oferta" en la matriz
+                  extendedMatrix[matriz.length][0] = "Demanda";
+                  extendedMatrix[0][matriz[0].length] = "Oferta";
+
+                  // Ingresar demandas
+                  for (int i = 1; i < extendedMatrix[0].length - 1; i++) {
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        TextEditingController demandaController =
+                            TextEditingController();
+                        return AlertDialog(
+                          title: Text('Ingrese la demanda del nodo ' +
+                              extendedMatrix[0][i]),
+                          content: TextField(
+                            controller: demandaController,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                extendedMatrix[extendedMatrix.length - 1][i] =
+                                    int.parse(demandaController.text);
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Aceptar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+
+                  // Ingresar ofertas
+                  for (int i = 1; i < extendedMatrix.length - 1; i++) {
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        TextEditingController ofertaController =
+                            TextEditingController();
+                        return AlertDialog(
+                          title: Text('Ingrese la oferta del nodo ' +
+                              extendedMatrix[i][0]),
+                          content: TextField(
+                            controller: ofertaController,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                extendedMatrix[i]
+                                        [extendedMatrix[0].length - 1] =
+                                    int.parse(ofertaController.text);
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Aceptar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                  for (int i = 0; i < extendedMatrix.length; i++) {
+                    for (int j = 0; j < extendedMatrix[i].length; j++) {
+                      if (extendedMatrix[i][j] == null) {
+                        extendedMatrix[i][j] =
+                            " "; // Reemplaza null por un espacio vacío
+                      }
+                    }
+                  }
+                  List<List<dynamic>> copia = List.from(extendedMatrix);
+                  noroesteController.matrizone = List.from(extendedMatrix);
+                  // impresion de la matriz
+                  for (int i = 0;
+                      i < noroesteController.matrizone.length;
+                      i++) {
+                    print(noroesteController.matrizone[i]);
+                  }
+                  noroesteController.matrizResultante = grafo.noroeste(copia);
+
+                  // Ingresar datos al controlador
+                  // Ir a la pantalla de asignacion
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Noroeste()),
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('No se ha creado un grafo'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Cerrar'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
-            ),
+            )
           ],
         ),
       ),

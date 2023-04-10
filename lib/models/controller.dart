@@ -80,3 +80,24 @@ class AsignacionController extends GetxController {
     update();
   }
 }
+
+class NoroesteController extends GetxController {
+  List<List<dynamic>> matrizone = [];
+  List<List<dynamic>> matrizResultante = [];
+
+  dynamic costoOptimo = 0;
+
+  //metodo para resetear todas las matrices y variables
+  //setter de la matriz original
+  void setMatrizOriginal(List<List<dynamic>> matriz) {
+    matrizone = matriz;
+  }
+
+  void resetNorth() {
+    matrizone = [];
+    matrizResultante = [];
+
+    costoOptimo = 0;
+    update();
+  }
+}

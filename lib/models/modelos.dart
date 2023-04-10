@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:collection/collection.dart';
+import 'dart:math';
 
 class Nodo {
   String valor;
@@ -189,11 +190,6 @@ class Grafo {
       }
     }
 
-    //imprimir las distancias
-    // print("Distancias desde el nodo origen:");
-    // for (Nodo nodo in nodos) {
-    //   print("${nodo.valor}: ${distancias[nodo]}");
-    // }
     return distancias;
   }
 
@@ -375,6 +371,39 @@ class Grafo {
     return matriz;
   }
 
+// MATRIZ DE ADYACENCIA MUTABLE:
+  List<List<dynamic>> matrizAdyacencia2() {
+    List<List<dynamic>> matriz = [];
+    List<dynamic> fila = [];
+    // agrega los nombres de los nodos a la primera fila
+    fila.add(" ");
+    for (Nodo nodo in nodos) {
+      fila.add(nodo.valor);
+    }
+    matriz.add(fila);
+    // agrega los nombres de los nodos a la primera columna y los pesos de los enlaces a la matriz
+    for (Nodo nodo in nodos) {
+      fila = [];
+      fila.add(nodo.valor);
+      for (Nodo nodo2 in nodos) {
+        if (nodo == nodo2) {
+          fila.add(0);
+        } else {
+          Enlace? enlace = enlaces.firstWhereOrNull(
+              (enlace) => (enlace.origen == nodo && enlace.destino == nodo2));
+          if (enlace != null) {
+            fila.add(enlace.peso);
+          } else {
+            fila.add(0);
+          }
+        }
+      }
+      matriz.add(fila);
+    }
+
+    return matriz;
+  }
+
   //INICIO
   List<List<dynamic>> resultadoConCeros(
       List<List<dynamic>> matrizCostos, bool minimizar) {
@@ -502,7 +531,51 @@ class Grafo {
   }
 
   //FIN
+  //ALGORITMO DE NOROESTE
+  //INICIO
+  List<List<dynamic>> noroeste(List<List<dynamic>> matriz) {
+    int m = matriz.length - 2; // Número de filas sin contar la fila de demanda
+    int n = matriz[0].length -
+        2; // Número de columnas sin contar la columna de oferta
 
+    List<List<dynamic>> asignaciones = List.generate(
+        m,
+        (i) => List<dynamic>.filled(
+            n, 0)); // Crear matriz de asignaciones con dimensiones m x n
+
+    int i = 1;
+    int j = 1;
+    while (i <= m && j <= n) {
+      int oferta = matriz[i][matriz[i].length - 1];
+      int demanda = matriz[matriz.length - 1][j];
+
+      int cantidadAsignada = min(oferta, demanda);
+
+      asignaciones[i - 1][j - 1] = cantidadAsignada;
+
+      if (oferta <= demanda) {
+        matriz[matriz.length - 1][j] -= cantidadAsignada;
+        matriz[i][matriz[i].length - 1] -= cantidadAsignada;
+        i++;
+      } else {
+        matriz[matriz.length - 1][j] -= cantidadAsignada;
+        matriz[i][matriz[i].length - 1] -= cantidadAsignada;
+        j++;
+      }
+    }
+    //imprimir asignaciones
+    for (int i = 0; i < asignaciones.length; i++) {
+      print(asignaciones[i]);
+    }
+    return asignaciones;
+  }
+
+  //FIN
+/*
+    for (int i = 0; i < asignaciones.length; i++) {
+      print(asignaciones[i]);
+    }
+*/
   dynamic calcularCosto(
       List<List<dynamic>> matrizOriginal, List<List<dynamic>> asignacion) {
     num costo = 0;
@@ -517,120 +590,4 @@ class Grafo {
     //imprimir costo
     return costo;
   }
-
-  /*
-  minimizacion asignacion alternativa
-  void main() {
-  List<List<int>> matrizCostos = [
-    [3, 5, 2],
-    [2, 4, 3],
-    [5, 3, 2],
-  ];
-
-  bool minimizar = true;
-
-  List<List<int>> asignacionResultante = asignacion(matrizCostos, minimizar);
-
-  print(asignacionResultante);
-}
-
-List<List<int>> asignacion(List<List<int>> matrizCostos, bool minimizar) {
-  int n = matrizCostos.length;
-  List<List<int>> asignacion = List.generate(n, (i) => List.filled(n, 0));
-  
-  // Paso 1: Restar el mínimo de cada fila
-  for (int i = 0; i < n; i++) {
-    int minimo = matrizCostos[i].reduce((a, b) => a < b ? a : b);
-    for (int j = 0; j < n; j++) {
-      matrizCostos[i][j] -= minimo;
-    }
-  }
-  
-  // Paso 2: Restar el mínimo de cada columna
-  for (int j = 0; j < n; j++) {
-    List<int> columna = [];
-    for (int i = 0; i < n; i++) {
-      columna.add(matrizCostos[i][j]);
-    }
-    int minimo = columna.reduce((a, b) => a < b ? a : b);
-    for (int i = 0; i < n; i++) {
-      matrizCostos[i][j] -= minimo;
-    }
-  }
-  
-  // Paso 3: Asignar valores
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (matrizCostos[i][j] == 0 && asignacion[i][j] == 0) {
-        asignacion[i][j] = 1;
-        break;
-      }
-    }
-  }
-  
-  // Paso 4: Comprobar si es necesario realizar más asignaciones
-  while (true) {
-    List<List<dynamic>> copiaMatrizCostos = matrizCostos.map((fila) => List.from(fila)).toList();
-    List<List<dynamic>> copiaAsignacion = asignacion.map((fila) => List.from(fila)).toList();
-    for (int i = 0; i < n; i++) {
-      if (asignacion[i].reduce((a, b) => a + b) == 0) {
-        List<int> indicesCeros = [];
-        for (int j = 0; j < n; j++) {
-          if (matrizCostos[i][j] == 0) {
-            indicesCeros.add(j);
-          }
-        }
-        if (indicesCeros.length > 0) {
-          for (int k = 0; k < indicesCeros.length; k++) {
-            int j = indicesCeros[k];
-            List<int> columna = [];
-            for (int i = 0; i < n; i++) {
-              columna.add(matrizCostos[i][j]);
-            }
-            int unicoCero = columna.reduce((a, b) => columna.indexOf(a) != k ? a : b);
-            if (columna.indexOf(unicoCero) == k) {
-              asignacion[i][j] = 1;
-              break;
-            }
-          }
-        }
-      }
-    }
-    if (compararListas(matrizCostos, copiaMatrizCostos) && compararListas(asignacion, copiaAsignacion)) {
-      break;
-    }
-  }
-  
-  // Paso 5: Calcular costo total
-  int costoTotal = 0;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (asignacion[i][j] == 1) {
-    costoTotal += matrizCostos[i][j];
-  }
-}
-}
-
-// Paso 6: Si se debe minimizar, se multiplica por -1 el costo total
-if (minimizar) {
-costoTotal *= -1;
-}
-
-return asignacion;
-}
-
-// Función auxiliar para comparar dos listas de listas de enteros
-bool compararListas(List<List<dynamic>> lista1, List<List<dynamic>> lista2) {
-int n = lista1.length;
-for (int i = 0; i < n; i++) {
-for (int j = 0; j < n; j++) {
-if (lista1[i][j] != lista2[i][j]) {
-return false;
-}
-}
-}
-return true;
-}
-
-  */
 }
