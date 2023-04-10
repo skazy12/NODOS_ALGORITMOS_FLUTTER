@@ -590,4 +590,9 @@ class Grafo {
     //imprimir costo
     return costo;
   }
+
+  List<List<dynamic>> original(List<List<dynamic>> matrcopia) {
+    List<List<dynamic>> original = matrcopia;
+    return original;
+  }
 }

@@ -89,9 +89,6 @@ class NoroesteController extends GetxController {
 
   //metodo para resetear todas las matrices y variables
   //setter de la matriz original
-  void setMatrizOriginal(List<List<dynamic>> matriz) {
-    matrizone = matriz;
-  }
 
   void resetNorth() {
     matrizone = [];

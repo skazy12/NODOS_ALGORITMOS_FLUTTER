@@ -528,18 +528,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     }
                   }
-                  List<List<dynamic>> copia = List.from(extendedMatrix);
-                  noroesteController.matrizone = List.from(extendedMatrix);
-                  // impresion de la matriz
-                  for (int i = 0;
-                      i < noroesteController.matrizone.length;
-                      i++) {
-                    print(noroesteController.matrizone[i]);
-                  }
-                  noroesteController.matrizResultante = grafo.noroeste(copia);
 
-                  // Ingresar datos al controlador
-                  // Ir a la pantalla de asignacion
+                  for (int i = 0; i < extendedMatrix.length; i++) {
+                    print(extendedMatrix[i]);
+                  }
+
+                  setState(() {
+                    noroesteController.matrizone = List.generate(
+                      extendedMatrix.length,
+                      (i) => List.generate(
+                        extendedMatrix[i].length,
+                        (j) => extendedMatrix[i][j],
+                      ),
+                    );
+                    noroesteController.matrizResultante =
+                        grafo.noroeste(extendedMatrix);
+                  });
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Noroeste()),
